@@ -19,16 +19,25 @@ class ComposerInfo {
      */
     private $packages;
 
-    public function __construct($pathToLockFile)
+    public function __construct($pathToLockFile, $packageName)
     {
         $this->pathToLockFile = $pathToLockFile;
+        $this->packageName = $packageName;
+
+        $this->parse();
     }
 
     public function parse()
     {
         $this->checkFile();
 
-        $this->decodedValue = json_decode(file_get_contents($this->pathToLockFile), true);
+        $temparray = json_decode(file_get_contents($this->pathToLockFile), true);
+
+        foreach($temparray['packages'] as $tempItem) {
+            if($tempItem['name']==$this->packageName) {
+               $this->decodedValue['packages']=array($tempItem);
+            }
+        }
 
         if (json_last_error()) {
             throw new RuntimeException("Json parser error: " . $this->getJsonLastErrorMsg());
@@ -62,10 +71,11 @@ class ComposerInfo {
 
         $this->packages = new PackagesCollection();
 
-        foreach($this->decodedValue['packages'] as $packageInfo) {
-            $this->packages[] = Package::factory($packageInfo);
+        if(array_key_exists("packages", $this->decodedValue)) {
+            foreach($this->decodedValue['packages'] as $packageInfo) {
+                $this->packages[] = Package::factory($packageInfo);
+            }
         }
-
         return $this->packages;
     }
 

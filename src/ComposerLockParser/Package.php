@@ -72,8 +72,7 @@ class Package {
     private $time;
 
     private function __construct($name, $version, array $source, array $dist, array $require,
-        array $requireDev, $type, array $autoload, array $license, array $authors, $description,
-        array $keywords, DateTime $time)
+        array $requireDev, $type, array $autoload, array $license, array $authors, $description, array $keywords, DateTime $time)
     {
         $this->name = $name;
         $this->version = $version;
@@ -92,21 +91,22 @@ class Package {
 
     public static function factory(array $packageInfo)
     {
+        //var_dump($packageInfo);
         return new self(
             $packageInfo['name'],
             $packageInfo['version'],
             $packageInfo['source'],
             $packageInfo['dist'],
-            $packageInfo['require'],
+            isset($packageInfo['require']) ? $packageInfo['require'] : [],
             isset($packageInfo['requireDev']) ? $packageInfo['requireDev'] : [],
-            $packageInfo['type'],
-            $packageInfo['autoload'],
+            isset($packageInfo['type']) ? $packageInfo['type'] : [],
+            isset($packageInfo['autoload']) ? $packageInfo['autoload'] : [],
             isset($packageInfo['license']) ? $packageInfo['license'] : [],
             isset($packageInfo['authors']) ? $packageInfo['authors'] : [],
-            $packageInfo['description'],
-            $packageInfo['keywords'],
+            isset($packageInfo['description']) ? $packageInfo['description'] : [],
+            isset($packageInfo['keywords']) ? $packageInfo['keywords'] : [],
             new DateTime($packageInfo['time'])
-        );
+            );
     }
 
     /**
@@ -128,6 +128,24 @@ class Package {
     /**
      * @return string
      */
+    public function getSource()
+    {
+        return $this->source['reference'];
+        //var_dump($this->source);
+        //return json_decode($this->source, true)->getReference();
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getTime()
+    {
+        return $this->time;
+    }
+
+    /**
+     * @return string
+     */
     public function getNamespace()
     {
         $namespace = '';
@@ -138,7 +156,7 @@ class Package {
             $namespace = $this->autoload['psr-4'];
         }
 
-        return trim(key($namespace), '\\');
+        return trim(key(array($namespace)), '\\');
     }
 
 } 
