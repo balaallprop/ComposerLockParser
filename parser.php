@@ -8,7 +8,10 @@ if(empty($argv[1]))
 	echo "\n";
 }
 else{
-	$dirObj = dir(__DIR__.'/../');
+	
+	$rootPath = realpath('.');
+	$dirObj = dir($rootPath);
+	//$dirObj = dir(__DIR__.'/../');
 	echo "\n----------------------------------\n";
 	echo "Packagename: ".$argv[1]."\n";
 	echo "Path: " . $dirObj->path;
@@ -24,7 +27,7 @@ else{
 	$hashes = [];
 
 	foreach ($folders as $app) {
-		$lockFile = __DIR__.'/../'.$app.'/composer.lock';
+		$lockFile = $rootPath.'/.'.$app.'/composer.lock';
 
 		if (!is_file($lockFile)) {
 			continue;
